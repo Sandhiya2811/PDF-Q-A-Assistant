@@ -143,3 +143,110 @@ These are fixed in code (not exposed in the UI) but can be changed in `app.py`:
 ## 📄 License
 
 Add your preferred license here (e.g. MIT).
+
+--- 
+
+# 🔄 Project Workflow
+
+### 1. PDF Upload
+
+→ User uploads a technical or financial PDF through the Streamlit UI.
+
+### 2. PDF Text Extraction
+
+→ Extract the text from the PDF.
+→ Preserve the **page number** along with the extracted text.
+
+### 3. Document Chunking
+
+→ Split the extracted text into small and meaningful chunks.
+→ For example, split based on paragraphs or sections.
+
+### 4. Create Embeddings
+
+→ Create an embedding for each text chunk.
+→ Embeddings convert the text into a numerical/vector representation.
+
+### 5. Store in Vector Database
+
+→ Store the following in **ChromaDB / FAISS**:
+
+* Text chunk
+* Embedding
+* Page number metadata
+* Chunk reference
+
+### 6. User Question
+
+→ User asks a question through the Streamlit chatbot.
+
+### 7. Similarity Search / Retrieval
+
+→ Convert the user's question into an embedding.
+→ Search the vector database to find the **most relevant chunks**.
+
+### 8. LLM + Retrieved Context
+
+→ Send only the retrieved relevant chunks to the LLM as context.
+
+### 9. Grounded Answer
+
+→ The LLM should generate the answer **only from the provided PDF text**.
+→ If the answer is not available in the retrieved context, return:
+
+> **"Information not found in the provided document."**
+
+### 10. Citation
+
+→ Show the **page number and chunk reference** along with the answer.
+
+**Example:**
+
+> Tesla's total revenue increased in 2024 compared with 2023.
+>
+> **Source: Page 45, Chunk 3**
+
+### 11. Similarity Score
+
+→ Show a **similarity score** to indicate how relevant each retrieved chunk is to the user's question.
+
+→ A higher score means the chunk is more relevant to the question.
+
+**Example:**
+
+```text
+Answer:
+Tesla reported total revenue of $X billion.
+
+Sources:
+📄 Page 45 | Similarity: 0.91
+📄 Page 46 | Similarity: 0.87
+```
+
+### 12. Streamlit UI
+
+→ Create a simple Streamlit interface for uploading the PDF and asking questions.
+
+**Final UI:**
+
+```text
+┌─────────────────────────────────────┐
+│     📄 PDF Question Answering       │
+├─────────────────────────────────────┤
+│ Upload PDF                          │
+│ [ Choose PDF ]                      │
+│                                     │
+│ Question:                           │
+│ [ What was Tesla's revenue? ]       │
+│                                     │
+│          [ Ask Question ]            │
+├─────────────────────────────────────┤
+│ Answer:                             │
+│ Tesla's revenue was ...             │
+│                                     │
+│ 📄 Sources                          │
+│ Page 45 | Similarity: 0.91          │
+│ Page 46 | Similarity: 0.87          │
+└─────────────────────────────────────┘
+```
+
